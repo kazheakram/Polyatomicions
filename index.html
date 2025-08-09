@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Polyatomic Ion Practice</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for clean text, with a fallback -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FFFFFF; /* White background for the rest of the page */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem; /* Add some padding for mobile */
+        }
+        .card-container {
+            background-color: #FFD1DC; /* Baby Pink for the widget background */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2); /* Pink shadow */
+            padding: 2.5rem; /* Increased padding */
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out; /* Smooth fade-in for the main card */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn {
+            background-color: #FF69B4; /* Hot pink for buttons */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Pill-shaped buttons */
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+        }
+        .btn:hover {
+            background-color: #FF85C4; /* Lighter pink on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.6);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.4);
+        }
+        input[type="text"] {
+            border: 2px solid #FFC0CB; /* Light pink border */
+            border-radius: 0.75rem; /* Rounded input */
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1.125rem;
+            color: #4A0033; /* Darker text for contrast */
+            background-color: #FFF0F5; /* Pale pink input background */
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #FF69B4; /* Hot pink on focus */
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.3);
+        }
+        .message-box {
+            background-color: #FFF0F5; /* Pale pink */
+            border: 1px solid #FFC0CB;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: #4A0033;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-text {
+            color: #FF1493; /* Deep pink for question */
+            font-size: 1.5rem; /* Larger question font */
+            font-weight: 700;
+        }
+        .streak-text {
+            color: #8B0000; /* Darker red for streak for emphasis */
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .footer-text {
+            color: #B0697D; /* Muted pink for footer */
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-center items-center p-4">
+
+    <div id="game-container" class="card-container flex flex-col items-center gap-6">
+        <h1 class="text-3xl font-bold text-pink-700 mb-2">💖 Daily Polyatomic Ion Practice! 💖</h1>
+        <p id="streak-display" class="streak-text"></p>
+
+        <div id="intro-screen" class="w-full">
+            <p class="text-lg text-pink-700 mb-4">Master your polyatomic ions with daily active recall!</p>
+            <button id="start-button" class="btn mt-4">Start Daily Practice</button>
+        </div>
+
+        <div id="game-screen" class="w-full hidden">
+            <p id="card-counter" class="text-pink-500 text-sm mb-4"></p>
+            <p id="question-display" class="question-text mb-6"></p>
+            <input type="text" id="answer-input" placeholder="Type your answer here..." class="mb-4">
+            <button id="submit-button" class="btn w-full">Submit Answer</button>
+            <p id="feedback-display" class="message-box mt-4 hidden"></p>
+            <button id="next-button" class="btn mt-4 hidden">Next Card</button>
+        </div>
+
+        <div id="completion-screen" class="w-full hidden">
+            <p id="completion-message" class="text-lg text-pink-700 mb-4"></p>
+            <p id="final-score" class="text-xl font-semibold text-pink-800 mb-6"></p>
+            <button id="return-home-button" class="btn">Return to Home</button>
+        </div>
+
+        <p class="footer-text">✨ Stay smart! ✨</p>
+    </div>
+
+    <script>
+        // Polyatomic Ion Data
+        const polyatomicIons = [
+            {"name": "Ammonium", "formula": "NH₄⁺"},
+            {"name": "Acetate", "formula": "CH₃COO⁻"},
+            {"name": "Nitrate", "formula": "NO₃⁻"},
+            {"name": "Nitrite", "formula": "NO₂⁻"},
+            {"name": "Hydroxide", "formula": "OH⁻"},
+            {"name": "Permanganate", "formula": "MnO₄⁻"},
+            {"name": "Carbonate", "formula": "CO₃²⁻"},
+            {"name": "Bicarbonate", "formula": "HCO₃⁻"},
+            {"name": "Sulfate", "formula": "SO₄²⁻"},
+            {"name": "Sulfite", "formula": "SO₃²⁻"},
+            {"name": "Chromate", "formula": "CrO₄²⁻"},
+            {"name": "Phosphate", "formula": "PO₄³⁻"},
+            {"name": "Phosphite", "formula": "PO₃³⁻"},
+            {"name": "Cyanide", "formula": "CN⁻"},
+            {"name": "Thiocyanate", "formula": "SCN⁻"},
+            {"name": "Oxalate", "formula": "C₂O₄²⁻"},
+            {"name": "Peroxide", "formula": "O₂²⁻"},
+        ];
+
+        // --- DOM Elements ---
+        const introScreen = document.getElementById('intro-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const completionScreen = document.getElementById('completion-screen');
+        const streakDisplay = document.getElementById('streak-display');
+        const startButton = document.getElementById('start-button');
+        const cardCounter = document.getElementById('card-counter');
+        const questionDisplay = document.getElementById('question-display');
+        const answerInput = document.getElementById('answer-input');
+        const submitButton = document.getElementById('submit-button');
+        const feedbackDisplay = document.getElementById('feedback-display');
+        const nextButton = document.getElementById('next-button');
+        const completionMessage = document.getElementById('completion-message');
+        const finalScore = document.getElementById('final-score');
+        const returnHomeButton = document.getElementById('return-home-button');
+
+        // --- Game State Variables ---
+        let currentStreak = 0;
+        let lastPlayedDate = null; // Stored as 'YYYY-MM-DD' string
+        let dailyIons = [];
+        let currentCardIndex = 0;
+        let correctAnswersToday = 0;
+        let currentQuizType = ''; // 'name_to_formula' or 'formula_to_name'
+        let currentCorrectAnswer = '';
+
+        // --- Progress Management (localStorage) ---
+        const PROGRESS_KEY = 'polyatomicIonGameProgress';
+
+        function loadProgress() {
+            try {
+                const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+                if (data) {
+                    currentStreak = data.streak || 0; // Default to 0 if streak not found
+                    lastPlayedDate = data.lastPlayedDate || null;
+                }
+            } catch (e) {
+                console.error("Error loading progress from localStorage:", e);
+                // Reset if parsing fails or data is corrupted
+                currentStreak = 0;
+                lastPlayedDate = null;
+            }
+        }
+
+        function saveProgress() {
+            const data = {
+                streak: currentStreak,
+                lastPlayedDate: lastPlayedDate
+            };
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
+        }
+
+        // --- Utility for Normalizing Answers ---
+        function normalizeFormula(str) {
+            str = str.replace(/\s+/g, ''); // Remove all whitespace
+
+            // Replace common unicode characters for numbers and charges
+            str = str.replace(/₀/g, '0').replace(/₁/g, '1').replace(/₂/g, '2').replace(/₃/g, '3')
+                     .replace(/₄/g, '4').replace(/₅/g, '5').replace(/₆/g, '6').replace(/₇/g, '7')
+                     .replace(/₈/g, '8').replace(/₉/g, '9');
+            str = str.replace(/⁻/g, '-').replace(/⁺/g, '+');
+
+            // Standardize charge notation: e.g., '2-' to '-2', '3+' to '+3'
+            // This regex handles digits followed by +/- (e.g., '3-')
+            str = str.replace(/([0-9])([+-])/g, '$2$1');
+            // This handles single charges like 'SO42-' which should be 'SO4-2'
+            // and 'NH4+' which should remain 'NH4+'
+            // Explicitly handle common single charges if they appear at the end without a number, e.g., 'OH-' 'NH4+'
+            str = str.replace(/(.+)([+-])$/, '$1$21'); // Add '1' for implicit single charges like 'OH-' -> 'OH-1'
+            str = str.replace(/([+-])1$/, '$1'); // Then remove the '1' if it's explicitly '1' after the sign. This ensures 'OH-' stays 'OH-' and not 'OH-1'.
+
+            // Further normalization for common variations (e.g. +3 vs 3+)
+            // Example: PO4 +3 should become PO4+3. Current polyatomic ions have `NH₄⁺` which becomes `NH4+`.
+            // The logic above ensures `NH4+` and `OH-`. So let's test this more.
+            // `PO4 -3` -> `PO4-3`.
+            // The `([0-9])([+-])` regex will transform `PO43-` into `PO4-3`.
+            // The unicode conversion handles `PO₄³⁻` to `PO43-` and then to `PO4-3`.
+            // So, `PO4 -3` (user) -> `PO4-3` (normalized)
+            // `PO₄³⁻` (correct) -> `PO43-` -> `PO4-3` (normalized)
+            // This seems consistent.
+
+            return str.toLowerCase();
+        }
+
+        // Master normalization function
+        function normalizeAnswer(answer, type) {
+            if (type === 'formula') {
+                return normalizeFormula(answer);
+            }
+            // For names, just lowercase and trim whitespace
+            return answer.trim().toLowerCase();
+        }
+
+        function displayStreak() {
+            streakDisplay.textContent = `✨ Your current streak: ${currentStreak} days ✨`;
+            // Make streak text darker for more contrast against pink background
+            streakDisplay.style.color = '#8B0000'; // Dark Red
+        }
+
+        // --- Game Logic ---
+
+        function checkAlreadyPlayedToday() {
+            const today = new Date().toISOString().slice(0, 10);
+            return lastPlayedDate === today;
+        }
+
+        function selectDailyCards() {
+            // Shuffle ions and pick 4 unique ones for daily practice
+            const shuffledIons = [...polyatomicIons].sort(() => 0.5 - Math.random());
+            dailyIons = shuffledIons.slice(0, 4);
+        }
+
+        function displayCard() {
+            if (currentCardIndex >= dailyIons.length) {
+                showCompletionScreen();
+                return;
+            }
+
+            const ion = dailyIons[currentCardIndex];
+            currentQuizType = Math.random() < 0.5 ? 'name_to_formula' : 'formula_to_name';
+
+            if (currentQuizType === 'name_to_formula') {
+                questionDisplay.innerHTML = `🎀 What is the **formula** for: <span class="text-pink-900">${ion.name}</span>?`;
+                currentCorrectAnswer = ion.formula;
+            } else {
+                questionDisplay.innerHTML = `🎀 What is the **name** for: <span class="text-pink-900">${ion.formula}</span>?`;
+                currentCorrectAnswer = ion.name;
+            }
+
+            cardCounter.textContent = `Card ${currentCardIndex + 1} of ${dailyIons.length}`;
+            answerInput.value = ''; // Clear input field
+            feedbackDisplay.classList.add('hidden'); // Hide feedback
+            submitButton.classList.remove('hidden'); // Show submit button
+            nextButton.classList.add('hidden'); // Hide next button
+            answerInput.focus(); // Focus input for quick typing
+        }
+
+        function checkAnswer() {
+            const ion = dailyIons[currentCardIndex];
+            let isCorrect = false;
+
+            if (currentQuizType === 'name_to_formula') {
+                isCorrect = (normalizeAnswer(answerInput.value, 'formula') === normalizeAnswer(ion.formula, 'formula'));
+            } else { // formula_to_name
+                isCorrect = (normalizeAnswer(answerInput.value, 'name') === normalizeAnswer(ion.name, 'name'));
+            }
+
+            if (isCorrect) {
+                feedbackDisplay.textContent = "💕 Correct! You're doing great! 💕";
+                feedbackDisplay.classList.remove('hidden');
+                correctAnswersToday++;
+            } else {
+                let displayedCorrectAnswer = currentCorrectAnswer;
+                if (currentQuizType === 'name_to_formula') {
+                    // For formulas, show the standard notation
+                    displayedCorrectAnswer = ion.formula;
+                } else {
+                    displayedCorrectAnswer = ion.name;
+                }
+                feedbackDisplay.textContent = `💔 Not quite. The correct answer is: ${displayedCorrectAnswer} 💔`;
+                feedbackDisplay.classList.remove('hidden');
+            }
+            submitButton.classList.add('hidden'); // Hide submit button
+            nextButton.classList.remove('hidden'); // Show next button
+        }
+
+        function nextCard() {
+            currentCardIndex++;
+            displayCard();
+        }
+
+        function showIntroScreen() {
+            introScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            completionScreen.classList.add('hidden');
+            displayStreak(); // Always show the current streak on the intro screen
+        }
+
+        function showGameScreen() {
+            introScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            completionScreen.classList.add('hidden');
+            // Reset for a new game session
+            currentCardIndex = 0;
+            correctAnswersToday = 0;
+            selectDailyCards();
+            displayCard();
+        }
+
+        function showCompletionScreen() {
+            gameScreen.classList.add('hidden');
+            completionScreen.classList.remove('hidden');
+
+            const today = new Date().toISOString().slice(0, 10);
+            const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10);
+
+            let completionMessageText = "";
+            const finalScoreText = `Your score: ${correctAnswersToday} / ${dailyIons.length}`;
+
+            if (correctAnswersToday === dailyIons.length) {
+                completionMessageText = "🌸 Fantastic! You got all of them right!";
+                if (lastPlayedDate !== today) { // Only update streak if today's session hasn't been counted yet
+                    if (lastPlayedDate === yesterday) {
+                        currentStreak++; // Continue streak
+                        completionMessageText += " Your streak continues! 🌸";
+                    } else {
+                        // First perfect play EVER, or streak was broken, so start new streak at 1
+                        currentStreak = 1;
+                        completionMessageText += " A new streak begins! 🌸";
+                    }
+                    lastPlayedDate = today; // Mark today as played (perfectly)
+                    saveProgress();
+                    displayStreak();
+                } else {
+                     // Already played perfectly today. Streak already handled.
+                     completionMessageText += " You already completed today's perfect practice! 🌸";
+                }
+            } else {
+                completionMessageText = "🎀 Good effort! Keep practicing! 🎀";
+                // Streak resets to 0 if not perfect (or stays 0 if it was already 0).
+                // Important: Only reset `currentStreak` and `lastPlayedDate` if today hasn't already been marked
+                // as a perfect completion. This prevents an imperfect attempt from ruining a perfect one earlier.
+                if (lastPlayedDate !== today) {
+                    currentStreak = 0; // Streak reset
+                    lastPlayedDate = today; // Mark today as played (imperfectly)
+                    saveProgress();
+                    displayStreak();
+                    completionMessageText += " Your streak has been reset. Keep going! 🎀";
+                } else {
+                    // If already played today perfectly, this imperfect attempt doesn't change the streak.
+                    // If already played today imperfectly, no change needed.
+                    completionMessageText += " Practice makes perfect! Try again tomorrow. 🎀";
+                }
+            }
+            completionMessage.textContent = completionMessageText;
+            finalScore.textContent = finalScoreText;
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', () => {
+            loadProgress(); // Load latest progress before checking
+            if (checkAlreadyPlayedToday()) {
+                introScreen.querySelector('p').innerHTML = "You've already completed your daily practice! Come back tomorrow to keep your streak! 🌸";
+                startButton.classList.add('hidden');
+                return;
+            }
+            showGameScreen();
+        });
+
+        submitButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', nextCard);
+        returnHomeButton.addEventListener('click', () => {
+            // Reload page to reset state and show fresh intro
+            window.location.reload();
+        });
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (submitButton.classList.contains('hidden')) { // If submit is hidden, next is visible
+                    nextCard();
+                } else {
+                    checkAnswer();
+                }
+            }
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            displayStreak(); // Display initial streak (0 or actual)
+            showIntroScreen();
+        });
+    </script>
+</body>
+</html>
