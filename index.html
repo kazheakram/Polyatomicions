@@ -3,420 +3,1030 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Polyatomic Ion Practice</title>
+    <title>SEO Keyword Tracker</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter for clean text, with a fallback -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: #FFFFFF; /* White background for the rest of the page */
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem; /* Add some padding for mobile */
+            background-color: #f7fafc;
+            color: #2d3748;
+            font-size: 0.9rem; /* Increased base font size */
         }
-        .card-container {
-            background-color: #FFD1DC; /* Baby Pink for the widget background */
-            border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2); /* Pink shadow */
-            padding: 2.5rem; /* Increased padding */
-            max-width: 500px;
+        .container {
+            max-width: 96%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .input-field {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
             width: 100%;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out; /* Smooth fade-in for the main card */
+            transition: all 0.2s ease-in-out;
+            font-size: 0.95rem;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .input-field:focus {
+            outline: none;
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
         }
         .btn {
-            background-color: #FF69B4; /* Hot pink for buttons */
+            background-color: #4c51bf;
             color: white;
             padding: 0.75rem 1.5rem;
-            border-radius: 9999px; /* Pill-shaped buttons */
+            border-radius: 0.5rem;
             font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
         .btn:hover {
-            background-color: #FF85C4; /* Lighter pink on hover */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.6);
+            background-color: #3b428d;
+            transform: translateY(-1px);
         }
         .btn:active {
             transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.4);
         }
-        input[type="text"] {
-            border: 2px solid #FFC0CB; /* Light pink border */
-            border-radius: 0.75rem; /* Rounded input */
-            padding: 0.75rem 1rem;
-            width: 100%;
-            font-size: 1.125rem;
-            color: #4A0033; /* Darker text for contrast */
-            background-color: #FFF0F5; /* Pale pink input background */
-            transition: all 0.2s ease-in-out;
+        .btn-secondary {
+            background-color: #6366f1;
         }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #FF69B4; /* Hot pink on focus */
-            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.3);
+        .btn-secondary:hover {
+            background-color: #4f46e5;
         }
         .message-box {
-            background-color: #FFF0F5; /* Pale pink */
-            border: 1px solid #FFC0CB;
-            border-radius: 0.75rem;
             padding: 1rem;
-            margin-top: 1.5rem;
-            font-size: 1rem;
-            color: #4A0033;
-            animation: slideIn 0.3s ease-out;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 500;
+            font-size: 0.85rem;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .message-box.success {
+            background-color: #d1fae5;
+            color: #065f46;
         }
-        .question-text {
-            color: #FF1493; /* Deep pink for question */
-            font-size: 1.5rem; /* Larger question font */
-            font-weight: 700;
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
-        .streak-text {
-            color: #8B0000; /* Darker red for streak for emphasis */
-            font-size: 1.25rem;
+        .message-box.info {
+            background-color: #e0e7ff;
+            color: #3f51b5;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4c51bf;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #edf2f7;
             font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: #4a5568;
         }
-        .footer-text {
-            color: #B0697D; /* Muted pink for footer */
-            font-size: 0.875rem;
-            margin-top: 2rem;
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        @media (max-width: 639px) { /* Extra small screens */
+            .add-keyword-flex {
+                flex-direction: column;
+            }
+            .add-keyword-flex .input-field {
+                margin-bottom: 0.75rem;
+            }
+            .btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
         }
     </style>
 </head>
-<body class="flex flex-col justify-center items-center p-4">
+<body>
+    <div class="container">
+        <h1 class="font-bold text-center text-indigo-800">SEO Keyword Tracker</h1>
 
-    <div id="game-container" class="card-container flex flex-col items-center gap-6">
-        <h1 class="text-3xl font-bold text-pink-700 mb-2">💖 Daily Polyatomic Ion Practice! 💖</h1>
-        <p id="streak-display" class="streak-text"></p>
-
-        <div id="intro-screen" class="w-full">
-            <p class="text-lg text-pink-700 mb-4">Master your polyatomic ions with daily active recall!</p>
-            <button id="start-button" class="btn mt-4">Start Daily Practice</button>
+        <!-- Control buttons for view switching and clear all -->
+        <div class="flex justify-center mt-3 mb-4 gap-4">
+            <button id="toggleViewBtn" class="btn btn-secondary text-base" disabled>Show History Chart</button>
+            <button id="deleteAllKeywordsBtn" class="btn bg-red-600 hover:bg-red-700 text-base" disabled>Clear All</button>
         </div>
 
-        <div id="game-screen" class="w-full hidden">
-            <p id="card-counter" class="text-pink-500 text-sm mb-4"></p>
-            <p id="question-display" class="question-text mb-6"></p>
-            <input type="text" id="answer-input" placeholder="Type your answer here..." class="mb-4">
-            <button id="submit-button" class="btn w-full">Submit Answer</button>
-            <p id="feedback-display" class="message-box mt-4 hidden"></p>
-            <button id="next-button" class="btn mt-4 hidden">Next Card</button>
+        <!-- Main View (Add Keyword & Tracked Keywords) -->
+        <div id="mainView">
+            <div class="card">
+                <h2 class="font-semibold mb-4 text-indigo-700">Add New Keyword</h2>
+                <div class="flex flex-col sm:flex-row gap-4 mb-4 items-center add-keyword-flex">
+                    <input type="text" id="keywordInput" class="input-field flex-grow" placeholder="Enter keyword">
+                    <button id="addKeywordBtn" class="btn shrink-0" disabled>Add <span id="addKeywordSpinner" class="hidden loading-spinner"></span></button>
+                </div>
+                <div id="messageBox" class="message-box hidden"></div>
+            </div>
+
+            <div id="autoUpdateStatus" class="message-box hidden text-center mb-4"></div>
+
+            <div class="card">
+                <h2 class="font-semibold mb-4 text-indigo-700">Your Tracked Keywords</h2>
+                <div class="table-responsive">
+                    <table id="keywordsTable">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>Volume</th>
+                                <th>Rank</th>
+                                <th>Diff</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordsTableBody">
+                            <!-- Keywords will be populated here -->
+                        </tbody>
+                    </table>
+                    <p id="noKeywordsMessage" class="text-gray-500 text-center mt-4 hidden">No keywords tracked yet. Add one above!</p>
+                </div>
+            </div>
         </div>
 
-        <div id="completion-screen" class="w-full hidden">
-            <p id="completion-message" class="text-lg text-pink-700 mb-4"></p>
-            <p id="final-score" class="text-xl font-semibold text-pink-800 mb-6"></p>
-            <button id="return-home-button" class="btn">Return to Home</button>
+        <!-- Keyword History Chart View (initially hidden) -->
+        <div id="chartView" class="hidden">
+            <div class="card">
+                <h2 class="font-semibold mb-4 text-indigo-700">Keyword History (Last 30 Days)</h2>
+                <select id="chartKeywordSelect" class="input-field mb-4">
+                    <option value="">Select a keyword to view history</option>
+                </select>
+                <div class="chart-container">
+                    <canvas id="keywordChart"></canvas>
+                </div>
+                <p id="noChartDataMessage" class="text-gray-500 text-center mt-4 hidden">Select a keyword to see its historical data.</p>
+            </div>
         </div>
-
-        <p class="footer-text">✨ Stay smart! ✨</p>
     </div>
 
-    <script>
-        // Polyatomic Ion Data
-        const polyatomicIons = [
-            {"name": "Ammonium", "formula": "NH₄⁺"},
-            {"name": "Acetate", "formula": "CH₃COO⁻"},
-            {"name": "Nitrate", "formula": "NO₃⁻"},
-            {"name": "Nitrite", "formula": "NO₂⁻"},
-            {"name": "Hydroxide", "formula": "OH⁻"},
-            {"name": "Permanganate", "formula": "MnO₄⁻"},
-            {"name": "Carbonate", "formula": "CO₃²⁻"},
-            {"name": "Bicarbonate", "formula": "HCO₃⁻"},
-            {"name": "Sulfate", "formula": "SO₄²⁻"},
-            {"name": "Sulfite", "formula": "SO₃²⁻"},
-            {"name": "Chromate", "formula": "CrO₄²⁻"},
-            {"name": "Phosphate", "formula": "PO₄³⁻"},
-            {"name": "Phosphite", "formula": "PO₃³⁻"},
-            {"name": "Cyanide", "formula": "CN⁻"},
-            {"name": "Thiocyanate", "formula": "SCN⁻"},
-            {"name": "Oxalate", "formula": "C₂O₄²⁻"},
-            {"name": "Peroxide", "formula": "O₂²⁻"},
-        ];
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            addDoc,
+            setDoc,
+            updateDoc,
+            deleteDoc,
+            onSnapshot,
+            collection,
+            query,
+            where,
+            getDocs,
+            Timestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- DOM Elements ---
-        const introScreen = document.getElementById('intro-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const completionScreen = document.getElementById('completion-screen');
-        const streakDisplay = document.getElementById('streak-display');
-        const startButton = document.getElementById('start-button');
-        const cardCounter = document.getElementById('card-counter');
-        const questionDisplay = document.getElementById('question-display');
-        const answerInput = document.getElementById('answer-input');
-        const submitButton = document.getElementById('submit-button');
-        const feedbackDisplay = document.getElementById('feedback-display');
-        const nextButton = document.getElementById('next-button');
-        const completionMessage = document.getElementById('completion-message');
-        const finalScore = document.getElementById('final-score');
-        const returnHomeButton = document.getElementById('return-home-button');
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- Game State Variables ---
-        let currentStreak = 0;
-        let lastPlayedDate = null; // Stored as 'YYYY-MM-DD' string
-        let dailyIons = [];
-        let currentCardIndex = 0;
-        let correctAnswersToday = 0;
-        let currentQuizType = ''; // 'name_to_formula' or 'formula_to_name'
-        let currentCorrectAnswer = '';
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let unsubscribeKeywords = null;
+        let authInitialized = false; // New flag
 
-        // --- Progress Management (localStorage) ---
-        const PROGRESS_KEY = 'polyatomicIonGameProgress';
+        let keywordChartInstance;
 
-        function loadProgress() {
+        // DOM Elements
+        const keywordInput = document.getElementById('keywordInput');
+        const addKeywordBtn = document.getElementById('addKeywordBtn');
+        const addKeywordSpinner = document.getElementById('addKeywordSpinner');
+        const deleteAllKeywordsBtn = document.getElementById('deleteAllKeywordsBtn');
+        const messageBox = document.getElementById('messageBox');
+        const autoUpdateStatus = document.getElementById('autoUpdateStatus');
+        const keywordsTableBody = document.getElementById('keywordsTableBody');
+        const noKeywordsMessage = document.getElementById('noKeywordsMessage');
+        const chartKeywordSelect = document.getElementById('chartKeywordSelect');
+        const keywordChartCanvas = document.getElementById('keywordChart');
+        const noChartDataMessage = document.getElementById('noChartDataMessage');
+        const toggleViewBtn = document.getElementById('toggleViewBtn');
+        const mainView = document.getElementById('mainView');
+        const chartView = document.getElementById('chartView');
+
+        // Initialize Firebase
+        async function initializeFirebase() {
             try {
-                const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
-                if (data) {
-                    currentStreak = data.streak || 0; // Default to 0 if streak not found
-                    lastPlayedDate = data.lastPlayedDate || null;
-                }
-            } catch (e) {
-                console.error("Error loading progress from localStorage:", e);
-                // Reset if parsing fails or data is corrupted
-                currentStreak = 0;
-                lastPlayedDate = null;
-            }
-        }
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
 
-        function saveProgress() {
-            const data = {
-                streak: currentStreak,
-                lastPlayedDate: lastPlayedDate
-            };
-            localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
-        }
+                // Set initial disabled state for buttons in JS as well, to be safe
+                addKeywordBtn.disabled = true;
+                deleteAllKeywordsBtn.disabled = true;
+                toggleViewBtn.disabled = true;
 
-        // --- Utility for Normalizing Answers ---
-        function normalizeFormula(str) {
-            str = str.replace(/\s+/g, ''); // Remove all whitespace
-
-            // Replace common unicode characters for numbers and charges
-            str = str.replace(/₀/g, '0').replace(/₁/g, '1').replace(/₂/g, '2').replace(/₃/g, '3')
-                     .replace(/₄/g, '4').replace(/₅/g, '5').replace(/₆/g, '6').replace(/₇/g, '7')
-                     .replace(/₈/g, '8').replace(/₉/g, '9');
-            str = str.replace(/⁻/g, '-').replace(/⁺/g, '+');
-
-            // Standardize charge notation: e.g., '2-' to '-2', '3+' to '+3'
-            // This regex handles digits followed by +/- (e.g., '3-')
-            str = str.replace(/([0-9])([+-])/g, '$2$1');
-            // This handles single charges like 'SO42-' which should be 'SO4-2'
-            // and 'NH4+' which should remain 'NH4+'
-            // Explicitly handle common single charges if they appear at the end without a number, e.g., 'OH-' 'NH4+'
-            str = str.replace(/(.+)([+-])$/, '$1$21'); // Add '1' for implicit single charges like 'OH-' -> 'OH-1'
-            str = str.replace(/([+-])1$/, '$1'); // Then remove the '1' if it's explicitly '1' after the sign. This ensures 'OH-' stays 'OH-' and not 'OH-1'.
-
-            // Further normalization for common variations (e.g. +3 vs 3+)
-            // Example: PO4 +3 should become PO4+3. Current polyatomic ions have `NH₄⁺` which becomes `NH4+`.
-            // The logic above ensures `NH4+` and `OH-`. So let's test this more.
-            // `PO4 -3` -> `PO4-3`.
-            // The `([0-9])([+-])` regex will transform `PO43-` into `PO4-3`.
-            // The unicode conversion handles `PO₄³⁻` to `PO43-` and then to `PO4-3`.
-            // So, `PO4 -3` (user) -> `PO4-3` (normalized)
-            // `PO₄³⁻` (correct) -> `PO43-` -> `PO4-3` (normalized)
-            // This seems consistent.
-
-            return str.toLowerCase();
-        }
-
-        // Master normalization function
-        function normalizeAnswer(answer, type) {
-            if (type === 'formula') {
-                return normalizeFormula(answer);
-            }
-            // For names, just lowercase and trim whitespace
-            return answer.trim().toLowerCase();
-        }
-
-        function displayStreak() {
-            streakDisplay.textContent = `✨ Your current streak: ${currentStreak} days ✨`;
-            // Make streak text darker for more contrast against pink background
-            streakDisplay.style.color = '#8B0000'; // Dark Red
-        }
-
-        // --- Game Logic ---
-
-        function checkAlreadyPlayedToday() {
-            const today = new Date().toISOString().slice(0, 10);
-            return lastPlayedDate === today;
-        }
-
-        function selectDailyCards() {
-            // Shuffle ions and pick 4 unique ones for daily practice
-            const shuffledIons = [...polyatomicIons].sort(() => 0.5 - Math.random());
-            dailyIons = shuffledIons.slice(0, 4);
-        }
-
-        function displayCard() {
-            if (currentCardIndex >= dailyIons.length) {
-                showCompletionScreen();
-                return;
-            }
-
-            const ion = dailyIons[currentCardIndex];
-            currentQuizType = Math.random() < 0.5 ? 'name_to_formula' : 'formula_to_name';
-
-            if (currentQuizType === 'name_to_formula') {
-                questionDisplay.innerHTML = `🎀 What is the **formula** for: <span class="text-pink-900">${ion.name}</span>?`;
-                currentCorrectAnswer = ion.formula;
-            } else {
-                questionDisplay.innerHTML = `🎀 What is the **name** for: <span class="text-pink-900">${ion.formula}</span>?`;
-                currentCorrectAnswer = ion.name;
-            }
-
-            cardCounter.textContent = `Card ${currentCardIndex + 1} of ${dailyIons.length}`;
-            answerInput.value = ''; // Clear input field
-            feedbackDisplay.classList.add('hidden'); // Hide feedback
-            submitButton.classList.remove('hidden'); // Show submit button
-            nextButton.classList.add('hidden'); // Hide next button
-            answerInput.focus(); // Focus input for quick typing
-        }
-
-        function checkAnswer() {
-            const ion = dailyIons[currentCardIndex];
-            let isCorrect = false;
-
-            if (currentQuizType === 'name_to_formula') {
-                isCorrect = (normalizeAnswer(answerInput.value, 'formula') === normalizeAnswer(ion.formula, 'formula'));
-            } else { // formula_to_name
-                isCorrect = (normalizeAnswer(answerInput.value, 'name') === normalizeAnswer(ion.name, 'name'));
-            }
-
-            if (isCorrect) {
-                feedbackDisplay.textContent = "💕 Correct! You're doing great! 💕";
-                feedbackDisplay.classList.remove('hidden');
-                correctAnswersToday++;
-            } else {
-                let displayedCorrectAnswer = currentCorrectAnswer;
-                if (currentQuizType === 'name_to_formula') {
-                    // For formulas, show the standard notation
-                    displayedCorrectAnswer = ion.formula;
-                } else {
-                    displayedCorrectAnswer = ion.name;
-                }
-                feedbackDisplay.textContent = `💔 Not quite. The correct answer is: ${displayedCorrectAnswer} 💔`;
-                feedbackDisplay.classList.remove('hidden');
-            }
-            submitButton.classList.add('hidden'); // Hide submit button
-            nextButton.classList.remove('hidden'); // Show next button
-        }
-
-        function nextCard() {
-            currentCardIndex++;
-            displayCard();
-        }
-
-        function showIntroScreen() {
-            introScreen.classList.remove('hidden');
-            gameScreen.classList.add('hidden');
-            completionScreen.classList.add('hidden');
-            displayStreak(); // Always show the current streak on the intro screen
-        }
-
-        function showGameScreen() {
-            introScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            completionScreen.classList.add('hidden');
-            // Reset for a new game session
-            currentCardIndex = 0;
-            correctAnswersToday = 0;
-            selectDailyCards();
-            displayCard();
-        }
-
-        function showCompletionScreen() {
-            gameScreen.classList.add('hidden');
-            completionScreen.classList.remove('hidden');
-
-            const today = new Date().toISOString().slice(0, 10);
-            const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10);
-
-            let completionMessageText = "";
-            const finalScoreText = `Your score: ${correctAnswersToday} / ${dailyIons.length}`;
-
-            if (correctAnswersToday === dailyIons.length) {
-                completionMessageText = "🌸 Fantastic! You got all of them right!";
-                if (lastPlayedDate !== today) { // Only update streak if today's session hasn't been counted yet
-                    if (lastPlayedDate === yesterday) {
-                        currentStreak++; // Continue streak
-                        completionMessageText += " Your streak continues! 🌸";
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        if (!authInitialized) { // Only run this part once on initial authentication
+                            setupRealtimeKeywordsListener();
+                            await checkAndAutoUpdateKeywords(); // Await auto-update before enabling UI fully
+                            authInitialized = true;
+                            // Enable buttons after auth and initial checks are complete
+                            addKeywordBtn.disabled = false;
+                            deleteAllKeywordsBtn.disabled = false;
+                            toggleViewBtn.disabled = false;
+                        }
                     } else {
-                        // First perfect play EVER, or streak was broken, so start new streak at 1
-                        currentStreak = 1;
-                        completionMessageText += " A new streak begins! 🌸";
+                        // If initial token is provided but not yet signed in, try with token
+                        if (initialAuthToken) {
+                            try {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                // onAuthStateChanged will fire again with the user object after successful sign-in
+                            } catch (error) {
+                                console.error("Error signing in with custom token:", error);
+                                await signInAnonymously(auth); // Fallback to anonymous if custom fails
+                            }
+                        } else {
+                            await signInAnonymously(auth); // Sign in anonymously by default
+                        }
+                        // If after all attempts, no user, ensure buttons remain disabled.
+                        // This handles cases where user logs out or session expires after initial setup.
+                        if (!user && authInitialized) { // Check authInitialized to not show this on first load if no user
+                            addKeywordBtn.disabled = true;
+                            deleteAllKeywordsBtn.disabled = true;
+                            toggleViewBtn.disabled = true;
+                            displayMessage("Authentication required. Please refresh.", "error");
+                        }
                     }
-                    lastPlayedDate = today; // Mark today as played (perfectly)
-                    saveProgress();
-                    displayStreak();
-                } else {
-                     // Already played perfectly today. Streak already handled.
-                     completionMessageText += " You already completed today's perfect practice! 🌸";
-                }
-            } else {
-                completionMessageText = "🎀 Good effort! Keep practicing! 🎀";
-                // Streak resets to 0 if not perfect (or stays 0 if it was already 0).
-                // Important: Only reset `currentStreak` and `lastPlayedDate` if today hasn't already been marked
-                // as a perfect completion. This prevents an imperfect attempt from ruining a perfect one earlier.
-                if (lastPlayedDate !== today) {
-                    currentStreak = 0; // Streak reset
-                    lastPlayedDate = today; // Mark today as played (imperfectly)
-                    saveProgress();
-                    displayStreak();
-                    completionMessageText += " Your streak has been reset. Keep going! 🎀";
-                } else {
-                    // If already played today perfectly, this imperfect attempt doesn't change the streak.
-                    // If already played today imperfectly, no change needed.
-                    completionMessageText += " Practice makes perfect! Try again tomorrow. 🎀";
-                }
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                displayMessage("Failed to initialize. Check console.", "error");
             }
-            completionMessage.textContent = completionMessageText;
-            finalScore.textContent = finalScoreText;
         }
 
-        // --- Event Listeners ---
-        startButton.addEventListener('click', () => {
-            loadProgress(); // Load latest progress before checking
-            if (checkAlreadyPlayedToday()) {
-                introScreen.querySelector('p').innerHTML = "You've already completed your daily practice! Come back tomorrow to keep your streak! 🌸";
-                startButton.classList.add('hidden');
-                return;
-            }
-            showGameScreen();
-        });
+        /**
+         * Displays a message to the user.
+         * @param {string} message The message to display.
+         * @param {'success'|'error'|'info'} type The type of message (for styling).
+         */
+        function displayMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}`;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
 
-        submitButton.addEventListener('click', checkAnswer);
-        nextButton.addEventListener('click', nextCard);
-        returnHomeButton.addEventListener('click', () => {
-            // Reload page to reset state and show fresh intro
-            window.location.reload();
-        });
-        answerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                if (submitButton.classList.contains('hidden')) { // If submit is hidden, next is visible
-                    nextCard();
-                } else {
-                    checkAnswer();
+        /**
+         * Shows a loading spinner and disables relevant buttons.
+         * @param {HTMLElement} spinnerElement The spinner DOM element.
+         */
+        function showLoading(spinnerElement) {
+            spinnerElement.classList.remove('hidden');
+            addKeywordBtn.disabled = true;
+            deleteAllKeywordsBtn.disabled = true;
+            toggleViewBtn.disabled = true;
+        }
+
+        /**
+         * Hides a loading spinner and enables relevant buttons.
+         * @param {HTMLElement} spinnerElement The spinner DOM element.
+         */
+        function hideLoading(spinnerElement) {
+            spinnerElement.classList.add('hidden');
+            addKeywordBtn.disabled = false;
+            deleteAllKeywordsBtn.disabled = false;
+            toggleViewBtn.disabled = false;
+        }
+
+        /**
+         * Calls the LLM to generate simulated SEO metrics for a given keyword.
+         * @param {string} keyword The keyword to generate metrics for.
+         * @returns {Promise<{searchVolume: number, rankingPosition: number, difficulty: number}>} Simulated SEO metrics.
+         */
+        async function generateSeoMetrics(keyword) {
+            const prompt = `Generate realistic, but slightly varying, SEO metrics (Search Volume, Ranking Position, Difficulty) for the keyword "${keyword}".
+            Provide the output as a JSON object with keys: "searchVolume" (integer, 100-50000), "rankingPosition" (integer, 1-100), "difficulty" (integer, 1-100).
+            Make sure the values are plausible for a real keyword, and for subsequent calls for the same keyword, slightly vary the numbers to simulate change over time.
+            Example: {"searchVolume": 1200, "rankingPosition": 15, "difficulty": 65}`;
+
+            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "searchVolume": { "type": "INTEGER" },
+                            "rankingPosition": { "type": "INTEGER" },
+                            "difficulty": { "type": "INTEGER" }
+                        },
+                        required: ["searchVolume", "rankingPosition", "difficulty"]
+                    }
+                }
+            };
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const maxRetries = 5;
+            let currentRetry = 0;
+
+            while (currentRetry < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const jsonString = result.candidates[0].content.parts[0].text;
+                        const parsedJson = JSON.parse(jsonString);
+                        return parsedJson;
+                    } else {
+                        throw new Error("Unexpected LLM response structure.");
+                    }
+                } catch (error) {
+                    console.error(`LLM API call failed (attempt ${currentRetry + 1}/${maxRetries}):`, error);
+                    currentRetry++;
+                    if (currentRetry < maxRetries) {
+                        const delay = Math.pow(2, currentRetry) * 1000;
+                        await new Promise(res => setTimeout(res, delay));
+                    } else {
+                        throw new Error("Failed to generate SEO metrics after multiple retries.");
+                    }
                 }
             }
-        });
+        }
 
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProgress();
-            displayStreak(); // Display initial streak (0 or actual)
-            showIntroScreen();
+
+        /**
+         * Adds a new keyword to Firestore.
+         */
+        async function addKeyword() {
+            const keyword = keywordInput.value.trim().toLowerCase();
+            if (!keyword) {
+                displayMessage("Please enter a keyword.", "error");
+                return;
+            }
+
+            if (!userId) {
+                displayMessage("User not authenticated. Please wait.", "error"); // Should not happen with new logic
+                return;
+            }
+
+            showLoading(addKeywordSpinner);
+            try {
+                const keywordRef = doc(db, `artifacts/${appId}/users/${userId}/keywords`, keyword.replace(/\s+/g, '-'));
+                const docSnap = await getDoc(keywordRef);
+
+                if (docSnap.exists()) {
+                    displayMessage(`Keyword "${keyword}" already exists.`, "error");
+                    return;
+                }
+
+                const metrics = await generateSeoMetrics(keyword);
+
+                const now = Timestamp.now();
+                const newKeywordData = {
+                    name: keyword,
+                    latestMetrics: {
+                        searchVolume: metrics.searchVolume,
+                        rankingPosition: metrics.rankingPosition,
+                        difficulty: metrics.difficulty,
+                        lastUpdated: now
+                    },
+                    createdAt: now
+                };
+
+                await setDoc(keywordRef, newKeywordData);
+
+                const historyCollectionRef = collection(keywordRef, 'history');
+                const today = new Date();
+
+                for (let i = 0; i < 30; i++) {
+                    const historyDate = new Date(today);
+                    historyDate.setDate(today.getDate() - i);
+
+                    const varianceFactor = (Math.random() - 0.5) * 0.2; // +/- 10% for volume/difficulty, +/- 10 ranks for position
+                    
+                    const historicalSearchVolume = Math.max(100, Math.round(metrics.searchVolume * (1 + varianceFactor)));
+                    const historicalRankingPosition = Math.max(1, Math.min(100, Math.round(metrics.rankingPosition + (Math.random() - 0.5) * 10)));
+                    const historicalDifficulty = Math.max(1, Math.min(100, Math.round(metrics.difficulty * (1 + varianceFactor))));
+
+                    await addDoc(historyCollectionRef, {
+                        date: Timestamp.fromDate(historyDate),
+                        searchVolume: historicalSearchVolume,
+                        rankingPosition: historicalRankingPosition,
+                        difficulty: historicalDifficulty
+                    });
+                }
+
+                displayMessage(`Keyword "${keyword}" added successfully with 30-day history!`, "success");
+                keywordInput.value = '';
+            } catch (error) {
+                console.error("Error adding keyword:", error);
+                displayMessage(`Error adding keyword: ${error.message}`, "error");
+            } finally {
+                hideLoading(addKeywordSpinner);
+            }
+        }
+
+        /**
+         * Checks all keywords and automatically updates those that haven't been updated in 24 hours.
+         */
+        async function checkAndAutoUpdateKeywords() {
+            if (!userId) {
+                console.warn("Cannot auto-update keywords: userId is null.");
+                return;
+            }
+
+            addKeywordBtn.disabled = true;
+            deleteAllKeywordsBtn.disabled = true;
+            toggleViewBtn.disabled = true;
+            
+            autoUpdateStatus.textContent = 'Checking for daily updates...';
+            autoUpdateStatus.className = 'message-box info';
+            autoUpdateStatus.classList.remove('hidden');
+
+            let updatedCount = 0;
+            try {
+                const keywordsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/keywords`);
+                const querySnapshot = await getDocs(keywordsCollectionRef);
+                const now = Timestamp.now().toMillis();
+
+                for (const docSnapshot of querySnapshot.docs) {
+                    const keywordData = docSnapshot.data();
+                    const lastUpdatedMillis = keywordData.latestMetrics.lastUpdated.toMillis();
+                    const timeDifference = now - lastUpdatedMillis;
+
+                    const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+                    if (timeDifference >= ONE_DAY_IN_MS) {
+                        const keywordName = keywordData.name;
+                        try {
+                            const newMetrics = await generateSeoMetrics(keywordName);
+                            const updateTimestamp = Timestamp.now();
+
+                            await updateDoc(docSnapshot.ref, {
+                                latestMetrics: {
+                                    searchVolume: newMetrics.searchVolume,
+                                    rankingPosition: newMetrics.rankingPosition,
+                                    difficulty: newMetrics.difficulty,
+                                    lastUpdated: updateTimestamp
+                                }
+                            });
+
+                            const historyCollectionRef = collection(docSnapshot.ref, 'history');
+                            await addDoc(historyCollectionRef, {
+                                date: updateTimestamp,
+                                searchVolume: newMetrics.searchVolume,
+                                rankingPosition: newMetrics.rankingPosition,
+                                difficulty: newMetrics.difficulty
+                            });
+                            updatedCount++;
+                        } catch (updateError) {
+                            console.error(`Error updating keyword "${keywordName}":`, updateError);
+                        }
+                    }
+                }
+                if (updatedCount > 0) {
+                    displayMessage(`Automatically updated ${updatedCount} keyword(s)!`, 'success');
+                } else {
+                    displayMessage('All keywords are up-to-date.', 'success');
+                }
+            } catch (error) {
+                console.error("Error during auto-update check:", error);
+                displayMessage(`Error during auto-update: ${error.message}`, "error");
+            } finally {
+                // Ensure buttons are enabled only if auth is ready
+                if (authInitialized) {
+                    addKeywordBtn.disabled = false;
+                    deleteAllKeywordsBtn.disabled = false;
+                    toggleViewBtn.disabled = false;
+                }
+                autoUpdateStatus.classList.add('hidden');
+            }
+        }
+
+
+        /**
+         * Deletes a single keyword and its history.
+         * @param {string} keywordId The ID of the keyword document to delete.
+         */
+        async function deleteKeyword(keywordId) {
+            if (!userId) {
+                displayMessage("User not authenticated.", "error"); // Should not happen with new logic
+                return;
+            }
+
+            const confirmDelete = await customConfirm(`Are you sure you want to delete the keyword "${keywordId}" and all its history?`);
+            if (!confirmDelete) {
+                return;
+            }
+
+            try {
+                const keywordDocRef = doc(db, `artifacts/${appId}/users/${userId}/keywords`, keywordId);
+                const historyCollectionRef = collection(keywordDocRef, 'history');
+
+                const historyDocs = await getDocs(historyCollectionRef);
+                const deleteHistoryPromises = historyDocs.docs.map(d => deleteDoc(d.ref));
+                await Promise.all(deleteHistoryPromises);
+
+                await deleteDoc(keywordDocRef);
+                displayMessage(`Keyword "${keywordId}" deleted successfully.`, "success");
+            } catch (error) {
+                console.error("Error deleting keyword:", error);
+                displayMessage(`Error deleting keyword: ${error.message}`, "error");
+            }
+        }
+
+        /**
+         * Deletes all keywords and their histories.
+         */
+        async function deleteAllKeywords() {
+            if (!userId) {
+                displayMessage("User not authenticated.", "error"); // Should not happen with new logic
+                return;
+            }
+
+            const confirmDelete = await customConfirm("Are you sure you want to delete ALL your tracked keywords and their history? This action cannot be undone.");
+            if (!confirmDelete) {
+                return;
+            }
+
+            addKeywordBtn.disabled = true;
+            deleteAllKeywordsBtn.disabled = true;
+            toggleViewBtn.disabled = true;
+
+            try {
+                const keywordsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/keywords`);
+                const querySnapshot = await getDocs(keywordsCollectionRef);
+
+                if (querySnapshot.empty) {
+                    displayMessage("No keywords to delete.", "error");
+                    return;
+                }
+
+                const deletePromises = querySnapshot.docs.map(async (docSnapshot) => {
+                    const keywordDocRef = docSnapshot.ref;
+                    const historyCollectionRef = collection(keywordDocRef, 'history');
+
+                    const historyDocs = await getDocs(historyCollectionRef);
+                    const deleteHistoryPromises = historyDocs.docs.map(d => deleteDoc(d.ref));
+                    await Promise.all(deleteHistoryPromises);
+
+                    await deleteDoc(keywordDocRef);
+                });
+
+                await Promise.all(deletePromises);
+                displayMessage("All keywords deleted successfully.", "success");
+            } catch (error) {
+                console.error("Error deleting all keywords:", error);
+                displayMessage(`Error deleting all keywords: ${error.message}`, "error");
+            } finally {
+                // Ensure buttons are enabled only if auth is ready
+                if (authInitialized) {
+                    addKeywordBtn.disabled = false;
+                    deleteAllKeywordsBtn.disabled = false;
+                    toggleViewBtn.disabled = false;
+                }
+            }
+        }
+
+        /**
+         * Custom confirmation dialog (replaces window.confirm).
+         * @param {string} message The message to display.
+         * @returns {Promise<boolean>} Resolves true if confirmed, false otherwise.
+         */
+        function customConfirm(message) {
+            return new Promise(resolve => {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-sm mx-auto shadow-lg text-center">
+                        <p class="text-lg font-semibold mb-4">${message}</p>
+                        <div class="flex justify-center gap-4">
+                            <button id="confirmYes" class="btn bg-green-600 hover:bg-green-700">Yes</button>
+                            <button id="confirmNo" class="btn bg-gray-400 hover:bg-gray-500">No</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('confirmYes').onclick = () => {
+                    document.body.removeChild(modal);
+                    resolve(true);
+                };
+                document.getElementById('confirmNo').onclick = () => {
+                    document.body.removeChild(modal);
+                    resolve(false);
+                };
+            });
+        }
+
+        /**
+         * Sets up a real-time listener for keywords in Firestore.
+         */
+        function setupRealtimeKeywordsListener() {
+            if (unsubscribeKeywords) {
+                unsubscribeKeywords();
+            }
+
+            if (!userId) {
+                console.warn("Cannot set up keyword listener: userId is null.");
+                return;
+            }
+
+            const keywordsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/keywords`);
+            unsubscribeKeywords = onSnapshot(keywordsCollectionRef, (snapshot) => {
+                renderKeywords(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            }, (error) => {
+                console.error("Error fetching real-time keywords:", error);
+                displayMessage("Error loading keywords.", "error");
+            });
+        }
+
+        /**
+         * Renders the keywords in the table and updates the chart select dropdown.
+         * Also controls visibility of the toggle chart button.
+         * @param {Array<Object>} keywords An array of keyword objects.
+         */
+        function renderKeywords(keywords) {
+            keywordsTableBody.innerHTML = '';
+            chartKeywordSelect.innerHTML = '<option value="">Select a keyword to view history</option>';
+
+            if (keywords.length === 0) {
+                noKeywordsMessage.classList.remove('hidden');
+                noChartDataMessage.classList.remove('hidden');
+                toggleViewBtn.classList.add('hidden'); // Hide toggle button if no keywords
+                if (keywordChartInstance) {
+                    keywordChartInstance.destroy();
+                }
+                return;
+            } else {
+                noKeywordsMessage.classList.add('hidden');
+                toggleViewBtn.classList.remove('hidden'); // Show toggle button if keywords exist
+            }
+
+            keywords.sort((a, b) => a.name.localeCompare(b.name));
+
+            keywords.forEach(keyword => {
+                const row = keywordsTableBody.insertRow();
+                const lastUpdatedDate = keyword.latestMetrics.lastUpdated ?
+                    new Date(keyword.latestMetrics.lastUpdated.toDate()).toLocaleDateString() : 'N/A';
+
+                row.innerHTML = `
+                    <td class="whitespace-nowrap">${keyword.name}</td>
+                    <td>${keyword.latestMetrics.searchVolume || 'N/A'}</td>
+                    <td>${keyword.latestMetrics.rankingPosition || 'N/A'}</td>
+                    <td>${keyword.latestMetrics.difficulty || 'N/A'}</td>
+                    <td class="whitespace-nowrap">${lastUpdatedDate}</td>
+                    <td>
+                        <button data-keyword-id="${keyword.id}" class="delete-btn text-red-600 hover:text-red-800 font-semibold text-sm">Delete</button>
+                    </td>
+                `;
+
+                const option = document.createElement('option');
+                option.value = keyword.id;
+                option.textContent = keyword.name;
+                chartKeywordSelect.appendChild(option);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const keywordId = e.target.dataset.keywordId;
+                    deleteKeyword(keywordId);
+                };
+            });
+
+            // If chart view is active, attempt to re-render chart for selected keyword
+            if (!chartView.classList.contains('hidden')) {
+                if (chartKeywordSelect.value) {
+                    renderChart(chartKeywordSelect.value);
+                } else if (chartKeywordSelect.options.length > 1) {
+                    chartKeywordSelect.value = chartKeywordSelect.options[1].value;
+                    renderChart(chartKeywordSelect.value);
+                } else {
+                    if (keywordChartInstance) {
+                        keywordChartInstance.destroy();
+                    }
+                    noChartDataMessage.classList.remove('hidden');
+                    noChartDataMessage.textContent = 'No keywords to display in chart.';
+                }
+            }
+        }
+
+        /**
+         * Renders the historical data chart for a selected keyword, showing only the last month.
+         * @param {string} keywordId The ID of the keyword to chart.
+         */
+        async function renderChart(keywordId) {
+            if (!keywordId || !userId) {
+                if (keywordChartInstance) {
+                    keywordChartInstance.destroy();
+                }
+                noChartDataMessage.classList.remove('hidden');
+                return;
+            }
+
+            noChartDataMessage.classList.add('hidden');
+
+            try {
+                const keywordDocRef = doc(db, `artifacts/${appId}/users/${userId}/keywords`, keywordId);
+                const historyCollectionRef = collection(keywordDocRef, 'history');
+                const q = query(historyCollectionRef);
+
+                const querySnapshot = await getDocs(q);
+                let historyData = querySnapshot.docs.map(doc => doc.data());
+
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                
+                historyData = historyData.filter(data => data.date.toDate() >= oneMonthAgo);
+                historyData.sort((a, b) => a.date.toDate() - b.date.toDate());
+
+                if (historyData.length < 2) {
+                    if (keywordChartInstance) {
+                        keywordChartInstance.destroy();
+                    }
+                    const keywordName = chartKeywordSelect.options[chartKeywordSelect.selectedIndex].textContent;
+                    if (historyData.length === 1) {
+                        noChartDataMessage.textContent = `Only one data point available for "${keywordName}" in the last month.`;
+                    } else if (querySnapshot.docs.length > 0) {
+                        noChartDataMessage.textContent = `No data for "${keywordName}" in the last month.`;
+                    } else {
+                        noChartDataMessage.textContent = `No historical data for "${keywordName}". Add keywords to see simulated 30-day history.`;
+                    }
+                    noChartDataMessage.classList.remove('hidden');
+                    return;
+                }
+
+                const dates = historyData.map(data => new Date(data.date.toDate()).toLocaleDateString());
+                const searchVolumes = historyData.map(data => data.searchVolume);
+                const rankingPositions = historyData.map(data => data.rankingPosition);
+                const difficulties = historyData.map(data => data.difficulty);
+
+                if (keywordChartInstance) {
+                    keywordChartInstance.destroy();
+                }
+
+                keywordChartInstance = new Chart(keywordChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Search Volume',
+                                data: searchVolumes,
+                                borderColor: '#4c51bf',
+                                backgroundColor: 'rgba(76, 81, 191, 0.2)',
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Ranking Position',
+                                data: rankingPositions,
+                                borderColor: '#d97706',
+                                backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                                fill: false,
+                                tension: 0.1,
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'Difficulty',
+                                data: difficulties,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                fill: false,
+                                tension: 0.1,
+                                yAxisID: 'y2'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: `SEO Metrics for ${chartKeywordSelect.options[chartKeywordSelect.selectedIndex].textContent} (Last 30 Days)`,
+                                font: {
+                                    size: 18
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date',
+                                    font: {
+                                        size: 14
+                                    }
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Search Volume',
+                                    font: {
+                                        size: 14
+                                    }
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    drawOnChartArea: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Ranking Position',
+                                    font: {
+                                        size: 14
+                                    }
+                                },
+                                reverse: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(0);
+                                    },
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                             y2: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                offset: true,
+                                grid: {
+                                    drawOnChartArea: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Difficulty',
+                                    font: {
+                                        size: 14
+                                    }
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error rendering chart:", error);
+                displayMessage(`Chart error: ${error.message}`, "error");
+            }
+        }
+
+
+        // Event Listeners
+        window.onload = initializeFirebase;
+
+        addKeywordBtn.onclick = addKeyword;
+        keywordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addKeyword();
+            }
         });
+        deleteAllKeywordsBtn.onclick = deleteAllKeywords;
+
+        // Toggle view button functionality
+        toggleViewBtn.onclick = () => {
+            const isMainViewVisible = !mainView.classList.contains('hidden');
+
+            if (isMainViewVisible) {
+                // Switch to chart view
+                mainView.classList.add('hidden');
+                chartView.classList.remove('hidden');
+                toggleViewBtn.textContent = 'Show Main Tracker';
+
+                // Attempt to render chart if keywords exist
+                if (chartKeywordSelect.options.length > 1) { // Check if there's at least one actual keyword
+                    // If no keyword is selected, or current selected keyword is invalid, select the first one
+                    if (!chartKeywordSelect.value || !chartKeywordSelect.querySelector(`option[value="${chartKeywordSelect.value}"]`)) {
+                        chartKeywordSelect.value = chartKeywordSelect.options[1].value; // Select the first actual keyword
+                    }
+                    renderChart(chartKeywordSelect.value);
+                } else {
+                    // No keywords to display in chart
+                    if (keywordChartInstance) {
+                        keywordChartInstance.destroy();
+                    }
+                    noChartDataMessage.classList.remove('hidden');
+                    noChartDataMessage.textContent = 'No keywords to display in chart. Add one in the main tracker view.';
+                }
+            } else {
+                // Switch back to main view
+                chartView.classList.add('hidden');
+                mainView.classList.remove('hidden');
+                toggleViewBtn.textContent = 'Show History Chart';
+                // Destroy chart when hidden to save resources
+                if (keywordChartInstance) {
+                    keywordChartInstance.destroy();
+                }
+            }
+        };
+
+        chartKeywordSelect.onchange = (e) => {
+            renderChart(e.target.value);
+        };
+
     </script>
 </body>
 </html>
