@@ -233,7 +233,13 @@
 
         // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        let firebaseConfig = {}; // Initialize as empty object
+        try {
+            firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        } catch (e) {
+            console.error("Error parsing __firebase_config:", e);
+            // Will be caught by initializeFirebase, but good to log early
+        }
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app;
@@ -241,7 +247,7 @@
         let auth;
         let userId = null;
         let unsubscribeKeywords = null;
-        let authInitialized = false; // New flag
+        let authInitialized = false; // Flag to ensure initial setup runs once
 
         let keywordChartInstance;
 
@@ -264,53 +270,58 @@
         // Initialize Firebase
         async function initializeFirebase() {
             try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Set initial disabled state for buttons in JS as well, to be safe
+                // Ensure buttons are disabled until auth is complete
                 addKeywordBtn.disabled = true;
                 deleteAllKeywordsBtn.disabled = true;
                 toggleViewBtn.disabled = true;
 
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
-                        if (!authInitialized) { // Only run this part once on initial authentication
+                        if (!authInitialized) {
+                            console.log("Firebase authenticated. User ID:", userId);
                             setupRealtimeKeywordsListener();
-                            await checkAndAutoUpdateKeywords(); // Await auto-update before enabling UI fully
+                            await checkAndAutoUpdateKeywords();
                             authInitialized = true;
-                            // Enable buttons after auth and initial checks are complete
+                            // Enable buttons only after authentication and initial data load
                             addKeywordBtn.disabled = false;
                             deleteAllKeywordsBtn.disabled = false;
                             toggleViewBtn.disabled = false;
+                            // displayMessage(`Signed in as: ${userId.substring(0, 8)}...`, 'success'); // Too much info for widget
                         }
                     } else {
-                        // If initial token is provided but not yet signed in, try with token
-                        if (initialAuthToken) {
-                            try {
+                        // User is currently signed out or initial state
+                        console.log("No user signed in. Attempting authentication...");
+                        try {
+                            if (initialAuthToken) {
+                                console.log("Attempting sign-in with custom token.");
                                 await signInWithCustomToken(auth, initialAuthToken);
-                                // onAuthStateChanged will fire again with the user object after successful sign-in
-                            } catch (error) {
-                                console.error("Error signing in with custom token:", error);
-                                await signInAnonymously(auth); // Fallback to anonymous if custom fails
+                            } else {
+                                console.log("No custom token. Attempting anonymous sign-in.");
+                                await signInAnonymously(auth);
                             }
-                        } else {
-                            await signInAnonymously(auth); // Sign in anonymously by default
-                        }
-                        // If after all attempts, no user, ensure buttons remain disabled.
-                        // This handles cases where user logs out or session expires after initial setup.
-                        if (!user && authInitialized) { // Check authInitialized to not show this on first load if no user
+                        } catch (authError) {
+                            console.error("Authentication failed:", authError);
+                            userId = null; // Ensure userId is null if auth fails
+                            displayMessage(`Authentication failed: ${authError.message}. Please refresh the page.`, "error");
+                            // Keep buttons disabled if auth definitively fails
                             addKeywordBtn.disabled = true;
                             deleteAllKeywordsBtn.disabled = true;
                             toggleViewBtn.disabled = true;
-                            displayMessage("Authentication required. Please refresh.", "error");
                         }
                     }
                 });
             } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                displayMessage("Failed to initialize. Check console.", "error");
+                console.error("Error initializing Firebase App:", error);
+                displayMessage(`Failed to initialize application: ${error.message}. Please check console.`, "error");
+                // Ensure buttons remain disabled if app initialization itself fails
+                addKeywordBtn.disabled = true;
+                deleteAllKeywordsBtn.disabled = true;
+                toggleViewBtn.disabled = true;
             }
         }
 
@@ -345,9 +356,12 @@
          */
         function hideLoading(spinnerElement) {
             spinnerElement.classList.add('hidden');
-            addKeywordBtn.disabled = false;
-            deleteAllKeywordsBtn.disabled = false;
-            toggleViewBtn.disabled = false;
+            // Re-enable buttons only if Firebase is authenticated
+            if (authInitialized) {
+                addKeywordBtn.disabled = false;
+                deleteAllKeywordsBtn.disabled = false;
+                toggleViewBtn.disabled = false;
+            }
         }
 
         /**
@@ -432,7 +446,7 @@
             }
 
             if (!userId) {
-                displayMessage("User not authenticated. Please wait.", "error"); // Should not happen with new logic
+                displayMessage("User not authenticated. Please refresh.", "error");
                 return;
             }
 
@@ -560,7 +574,6 @@
                 console.error("Error during auto-update check:", error);
                 displayMessage(`Error during auto-update: ${error.message}`, "error");
             } finally {
-                // Ensure buttons are enabled only if auth is ready
                 if (authInitialized) {
                     addKeywordBtn.disabled = false;
                     deleteAllKeywordsBtn.disabled = false;
@@ -577,7 +590,7 @@
          */
         async function deleteKeyword(keywordId) {
             if (!userId) {
-                displayMessage("User not authenticated.", "error"); // Should not happen with new logic
+                displayMessage("User not authenticated. Please refresh.", "error");
                 return;
             }
 
@@ -607,7 +620,7 @@
          */
         async function deleteAllKeywords() {
             if (!userId) {
-                displayMessage("User not authenticated.", "error"); // Should not happen with new logic
+                displayMessage("User not authenticated. Please refresh.", "error");
                 return;
             }
 
@@ -646,7 +659,6 @@
                 console.error("Error deleting all keywords:", error);
                 displayMessage(`Error deleting all keywords: ${error.message}`, "error");
             } finally {
-                // Ensure buttons are enabled only if auth is ready
                 if (authInitialized) {
                     addKeywordBtn.disabled = false;
                     deleteAllKeywordsBtn.disabled = false;
@@ -720,14 +732,14 @@
             if (keywords.length === 0) {
                 noKeywordsMessage.classList.remove('hidden');
                 noChartDataMessage.classList.remove('hidden');
-                toggleViewBtn.classList.add('hidden'); // Hide toggle button if no keywords
+                toggleViewBtn.classList.add('hidden');
                 if (keywordChartInstance) {
                     keywordChartInstance.destroy();
                 }
                 return;
             } else {
                 noKeywordsMessage.classList.add('hidden');
-                toggleViewBtn.classList.remove('hidden'); // Show toggle button if keywords exist
+                toggleViewBtn.classList.remove('hidden');
             }
 
             keywords.sort((a, b) => a.name.localeCompare(b.name));
@@ -761,7 +773,6 @@
                 };
             });
 
-            // If chart view is active, attempt to re-render chart for selected keyword
             if (!chartView.classList.contains('hidden')) {
                 if (chartKeywordSelect.value) {
                     renderChart(chartKeywordSelect.value);
